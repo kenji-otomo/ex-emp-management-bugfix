@@ -87,7 +87,7 @@ public class AdministratorController {
 //		入力されたパスワードと確認用パスワードが一致しなければ、エラーメッセージを格納して登録画面に遷移
 		String password = form.getPassword();
 		String checkPassword = form.getCheckPassword();
-		if (!(password.equals(checkPassword))) {
+		if (!password.equals(checkPassword)) {
 			model.addAttribute("passwordmessage", "パスワードが一致しません");
 			return "administrator/insert";
 		}
@@ -122,12 +122,13 @@ public class AdministratorController {
 	 * @return ログイン後の従業員一覧画面
 	 */
 	@RequestMapping("/login")
-	public String login(LoginForm form, BindingResult result, Model model) {
+	public String login(LoginForm form, BindingResult result, Model model,HttpSession session) {
 		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
 		if (administrator == null) {
 			model.addAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
 			return toLogin();
 		}
+		session.setAttribute("administratorName", administrator.getName());
 		return "forward:/employee/showList";
 	}
 	
