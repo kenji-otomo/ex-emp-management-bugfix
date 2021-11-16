@@ -74,14 +74,21 @@ public class AdministratorController {
 	 */
 	@RequestMapping("/insert")
 	public String insert(@Validated InsertAdministratorForm form,BindingResult result,Model model) {
-		
+		//エラーがあったら登録画面に遷移
 		if (result.hasErrors()) {
 			return "administrator/insert";
 		}
-		
+//		メールアドレスが重複していた場合、エラーメッセージを格納して登録画面に遷移
 		String mail = form.getMailAddress();
 		if (administratorService.findByMailAddress(mail) != null) {
-			model.addAttribute("message", "このメールアドレスは既に使用されています");
+			model.addAttribute("mailmessage", "このメールアドレスは既に使用されています");
+			return "administrator/insert";
+		}
+//		入力されたパスワードと確認用パスワードが一致しなければ、エラーメッセージを格納して登録画面に遷移
+		String password = form.getPassword();
+		String checkPassword = form.getCheckPassword();
+		if (!(password.equals(checkPassword))) {
+			model.addAttribute("passwordmessage", "パスワードが一致しません");
 			return "administrator/insert";
 		}
 		
