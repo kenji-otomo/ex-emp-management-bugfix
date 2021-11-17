@@ -83,4 +83,32 @@ public class EmployeeRepository {
 		String updateSql = "UPDATE employees SET dependents_count=:dependentsCount WHERE id=:id";
 		template.update(updateSql, param);
 	}
+	
+	public List<Employee> findByLikeName(String name) {
+		
+		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count "
+				+ " FROM employees "
+				+ " WHERE name like :name "
+				+ " ORDER BY hire_date DESC;";
+		
+		SqlParameterSource param = new MapSqlParameterSource().addValue("name", '%'+name+'%');
+		List<Employee>list = template.query(sql, param, EMPLOYEE_ROW_MAPPER);
+		if(list.size() == 0) {
+			return null;
+		}
+		return list;
+	}
+	
+	/**
+	 * 従業員情報を挿入します.
+	 * 
+	 * @param Employee 従業員情報
+	 */
+	public void insert(Employee employee) {
+		SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
+		String sql = "insert into employees(id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count) "
+				+ "SELECT max(id)+1,:name,:image,:gender,:hireDate,:mailAddress,:zipCode,:address,:telephone,:salary,:characteristics,:dependentsCount "
+				+ " FROM employees;";
+		template.update(sql, param);
+	}
 }
