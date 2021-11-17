@@ -86,10 +86,6 @@ public class EmployeeRepository {
 	
 	public List<Employee> findByLikeName(String name) {
 		
-		if (name == "") {
-			return findAll();
-		}
-		
 		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count "
 				+ " FROM employees "
 				+ " WHERE name like :name "
@@ -111,7 +107,8 @@ public class EmployeeRepository {
 	public void insert(Employee employee) {
 		SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
 		String sql = "insert into employees(id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count) "
-				+ "values((SELECT max(id) FROM employees)+1,:name,:image,:gender,:hire_date,:mail_address,:zip_code,:address,:telephone,:salary,:characteristics,:dependents_count);";
+				+ "SELECT max(id)+1,:name,:image,:gender,:hireDate,:mailAddress,:zipCode,:address,:telephone,:salary,:characteristics,:dependentsCount "
+				+ " FROM employees;";
 		template.update(sql, param);
 	}
 }

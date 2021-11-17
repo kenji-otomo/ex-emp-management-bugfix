@@ -1,5 +1,6 @@
 package jp.co.sample.emp_management.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,18 @@ public class EmployeeService {
 	}
 	
 	public List<Employee> search(String name) {
-		List<Employee>list = employeeRepository.findByLikeName(name);
+		List<Employee>list = new ArrayList<>();
+		
+		if (name == "") {
+			list = employeeRepository.findAll();
+		}else {
+			list = employeeRepository.findByLikeName(name);
+		}
+		
 		return list;
+	}
+	
+	public void insert(Employee employee) {
+		employeeRepository.insert(employee);
 	}
 }
