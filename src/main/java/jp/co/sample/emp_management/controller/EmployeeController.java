@@ -1,5 +1,6 @@
 package jp.co.sample.emp_management.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jp.co.sample.emp_management.domain.Employee;
 import jp.co.sample.emp_management.form.UpdateEmployeeForm;
+import jp.co.sample.emp_management.form.InsertEmployeeForm;
+import jp.co.sample.emp_management.form.SearchEmployeeForm;
 import jp.co.sample.emp_management.service.EmployeeService;
 
 /**
@@ -36,6 +39,16 @@ public class EmployeeController {
 	public UpdateEmployeeForm setUpForm() {
 		return new UpdateEmployeeForm();
 	}
+	
+	@ModelAttribute
+	public SearchEmployeeForm setUpSearchEmployeeForm() {
+		return new SearchEmployeeForm();
+	}
+	
+	@ModelAttribute
+	public InsertEmployeeForm setUpInsertEmployeeForm() {
+		return new InsertEmployeeForm();
+	}
 
 	/////////////////////////////////////////////////////
 	// ユースケース：従業員一覧を表示する
@@ -49,6 +62,21 @@ public class EmployeeController {
 	@RequestMapping("/showList")
 	public String showList(Model model) {
 		List<Employee> employeeList = employeeService.showList();
+		model.addAttribute("employeeList", employeeList);
+		return "employee/list";
+	}
+	
+	@RequestMapping("/search")
+	public String search(SearchEmployeeForm form,Model model) {
+		
+		List<Employee>employeeList = new ArrayList<>();
+		employeeList = employeeService.search(form.getName());
+			
+		if (employeeList == null) {
+			employeeList = employeeService.showList();
+			model.addAttribute("emptyMessage", "一件もありませんでした");
+		}
+		
 		model.addAttribute("employeeList", employeeList);
 		return "employee/list";
 	}
@@ -91,5 +119,10 @@ public class EmployeeController {
 		employee.setDependentsCount(form.getIntDependentsCount());
 		employeeService.update(employee);
 		return "redirect:/employee/showList";
+	}
+	
+	@RequestMapping("/toInsert")
+	public String toInsert() {
+		return "employee/insert";
 	}
 }
